@@ -27,75 +27,25 @@ function begin_ts_highlight(bufnr, lang, owner)
   end)
 end
 
-local vim_enter = true
-
 ---@param bufnr integer
 ---@param lang string
 function M.attach(bufnr, lang)
-  if vim_enter then
+  if vim.g.vim_enter then
     vim.treesitter.start(bufnr, lang)
-    vim_enter = false
+    vim.g.vim_enter = false
     return
   end
-  local timer = vim.loop.new_timer()
-  vim.defer_fn(function()
-    local is_active = timer:is_active()
-    if is_active then
-      vim.notify("Timer haven't been closed!", vim.log.levels.ERROR)
-    end
-  end, 2000)
-  local has_start = false
-  local timout = function(opts)
-    local force = opts.force
-    local time = opts.time
+  require("config.utils").real_enter(function()
+    begin_ts_highlight(bufnr, lang, "highligter")
+  end, function()
     if not vim.api.nvim_buf_is_valid(bufnr) then
-      if timer:is_active() then
-        timer:close()
-      end
-      return
+      return false
     end
-    if (not force) and has_start then
-      return
+    if vim.b[bufnr].ts_parse_over then
+      return false
     end
-    if timer:is_active() then
-      timer:close()
-      -- haven't start
-      has_start = true
-      -- __AUTO_GENERATED_PRINT_VAR_START__
-      print([==[ts do not start in ]==], vim.inspect(time)) -- __AUTO_GENERATED_PRINT_VAR_END__
-      begin_ts_highlight(bufnr, lang, "highligter")
-    end
-  end
-  vim.defer_fn(function()
-    timout { force = false, time = 100 }
-  end, 100)
-  vim.defer_fn(function()
-    timout { force = true, time = 1000 }
-  end, 1000)
-  local col = vim.fn.screencol()
-  local row = vim.fn.screenrow()
-  timer:start(1, 2, function()
-    vim.schedule(function()
-      if not vim.api.nvim_buf_is_valid(bufnr) then
-        if timer:is_active() then
-          timer:close()
-        end
-        return
-      end
-      if has_start then
-        return
-      end
-      local new_col = vim.fn.screencol()
-      local new_row = vim.fn.screenrow()
-      if new_row ~= row or new_col ~= col then
-        if timer:is_active() then
-          timer:close()
-          has_start = true
-          begin_ts_highlight(bufnr, lang, "highligter")
-        end
-      end
-    end)
-  end)
+    return true
+  end, "treesitter-highlight")
 end
 
 ---@param bufnr integer
