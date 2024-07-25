@@ -38,13 +38,7 @@ function M.attach(bufnr, lang)
   require("config.utils").real_enter(function()
     begin_ts_highlight(bufnr, lang, "highligter")
   end, function()
-    if not vim.api.nvim_buf_is_valid(bufnr) then
-      return false
-    end
-    if vim.b[bufnr].ts_parse_over then
-      return false
-    end
-    return true
+    return vim.api.nvim_buf_is_valid(bufnr)
   end, "treesitter-highlight")
 end
 
