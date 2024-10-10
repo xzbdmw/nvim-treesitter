@@ -300,6 +300,9 @@ function M.update_selection(buf, node, selection_mode)
   api.nvim_win_set_cursor(0, { start_row, start_col - 1 })
   vim.cmd "normal! o"
   api.nvim_win_set_cursor(0, { end_row, end_col - 1 })
+  api.nvim_exec_autocmds("User", {
+    pattern = "v_V",
+  })
 end
 
 -- Byte length of node range
