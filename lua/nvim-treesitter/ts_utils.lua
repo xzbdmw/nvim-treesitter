@@ -276,6 +276,11 @@ end
 -- @param selection_mode One of "charwise" (default) or "v", "linewise" or "V",
 --   "blockwise" or "<C-v>" (as a string with 5 characters or a single character)
 function M.update_selection(buf, node, selection_mode)
+  local ok, n = pcall(ts.get_node_range, node)
+  if not ok then
+    vim.notify("No range at cursor", vim.log.levels.INFO)
+    error "fail"
+  end
   local start_row, start_col, end_row, end_col = M.get_vim_range({ ts.get_node_range(node) }, buf)
 
   local v_table = { charwise = "v", linewise = "V", blockwise = "<C-v>" }

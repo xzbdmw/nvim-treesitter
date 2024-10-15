@@ -16,7 +16,10 @@ function M.init_selection()
   local buf = api.nvim_get_current_buf()
   local node = ts_utils.get_node_at_cursor()
   selections[buf] = { [1] = node }
-  ts_utils.update_selection(buf, node)
+  local ok = pcall(ts_utils.update_selection, buf, node)
+  if not ok then
+    selections[buf] = nil
+  end
 end
 
 -- Get the range of the current visual selection.
