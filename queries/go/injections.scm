@@ -29,6 +29,15 @@
   (#set! injection.language "printf"))
 
 ((call_expression
+  function: (identifier)
+  arguments: (argument_list
+    (_)
+    .
+    (interpreted_string_literal) @injection.content))
+  (#any-of? @_method "Dprintf")
+  (#set! injection.language "printf"))
+
+((call_expression
   function: (selector_expression
     field: (field_identifier) @_method)
   arguments: (argument_list
