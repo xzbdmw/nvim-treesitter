@@ -445,7 +445,7 @@ function M.swap_nodes(node_or_range1, node_or_range2, bufnr, cursor_to_second)
   end
 end
 
-function M.goto_node(node, goto_end, avoid_set_jump)
+function M.goto_node(node, goto_end, avoid_set_jump, mode)
   if not node then
     return
   end
@@ -467,8 +467,14 @@ function M.goto_node(node, goto_end, avoid_set_jump)
   if mode.mode == "no" then
     vim.cmd "normal! v"
   end
-
-  -- Position is 1, 0 indexed.
+  if goto_end then
+    if mode.mode ~= "n" then
+      local line = position[1] - 1
+      local count = vim.api.nvim_buf_get_lines(0, line - 1, line, false)[1]:len()
+      api.nvim_win_set_cursor(0, { line, count - 1 })
+      return
+    end
+  end
   api.nvim_win_set_cursor(0, { position[1], position[2] - 1 })
 end
 
