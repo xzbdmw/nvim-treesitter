@@ -17,6 +17,10 @@ function M.init_selection()
     FeedKeys(tostring(vim.v.count) .. "gg", "m")
     return
   end
+  if require("config.utils").commented() then
+    FeedKeys("vu", "m")
+    return
+  end
   local buf = api.nvim_get_current_buf()
   local node = ts_utils.get_node_at_cursor()
   selections[buf] = { [1] = node }

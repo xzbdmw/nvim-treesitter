@@ -29,7 +29,7 @@
   (#set! injection.language "printf"))
 
 ((call_expression
-  function: (identifier)
+  function: ((identifier)@_method)
   arguments: (argument_list
     (_)
     .
