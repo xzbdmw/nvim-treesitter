@@ -75,7 +75,16 @@ local function select_incremental(get_parent)
     if not nodes or #nodes == 0 or not range_matches(nodes[#nodes]) then
       local root = parsers.get_parser():parse()[1]:root()
       local node = root:named_descendant_for_range(csrow - 1, cscol - 1, cerow - 1, cecol)
-      ts_utils.update_selection(buf, node)
+      local parent = get_parent(node)
+      if
+        vim.deep_equal(
+          { ts_utils.get_vim_range({ vim.treesitter.get_node_range(parent) }, buf) },
+          { ts_utils.get_vim_range({ vim.treesitter.get_node_range(node) }, buf) }
+        )
+      then
+        parent = get_parent(root:named_descendant_for_range(csrow - 1, cscol - 1, cerow - 1, cecol + 1))
+      end
+      ts_utils.update_selection(buf, parent)
       if nodes and #nodes > 0 then
         table.insert(selections[buf], node)
       else
